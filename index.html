@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Control de Dispositivos</title>
+    <link rel="stylesheet" href="./src/style.css" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  </head>
+  <body>
+    <div class="main-container">
+      <header>
+        <nav>
+          <a href="#" class="nav-link" data-view="welcome">Inicio</a>
+          <a href="#" class="nav-link" data-view="register">Registro</a>
+          <a href="#" class="nav-link" data-view="login">Ingresar</a>
+          <a href="#" class="nav-link" id="logoutBtn" style="display: none"
+            >Cerrar Sesión</a
+          >
+        </nav>
+      </header>
+
+      <main id="content-container">
+        <section id="welcomeView" class="view">
+          <div class="welcome-card">
+            <h1>Bienvenido!!</h1>
+            <p>Por favor, registra un nuevo usuario.</p>
+          </div>
+        </section>
+
+        <section id="registerView" class="view" style="display: none">
+          <div class="form-card">
+            <h2>Registrar Usuario</h2>
+            <form id="registerForm">
+              <label for="deviceName">Correo:</label>
+              <input type="text" id="deviceName" required />
+
+              <label for="enrollId">Contraseña:</label>
+              <input type="password" id="enrollId" required />
+
+              <button type="submit" id="registerBtn">Registrar</button>
+            </form>
+            <div id="registerMessage" class="message"></div>
+          </div>
+        </section>
+
+        <section id="loginView" class="view" style="display: none">
+          <div class="form-card">
+            <h2>Ingresar</h2>
+            <form id="loginForm">
+              <label for="loginEnrollId">Registro:</label>
+              <input type="password" id="loginEnrollId" required />
+              <button type="submit" id="loginBtn">Ingresar</button>
+            </form>
+            <div id="loginMessage" class="message"></div>
+          </div>
+        </section>
+
+        <section id="controlView" class="view" style="display: none">
+          <div class="device-card">
+            <h2 id="deviceControlTitle">
+              Control de Dispositivo: <span id="deviceNameDisplay"></span>
+            </h2>
+            <p>Registro: <span id="enrollIdDisplay"></span></p>
+            <p>Último Valor: <span id="lastValueDisplay"></span></p>
+            <p>Estado: <span id="statusDisplay">APAGADO</span></p>
+
+            <div class="button-group">
+              <button id="turnOnBtn">Encender</button>
+              <button id="turnOffBtn">Apagar</button>
+              <button id="refreshBtn">Actualizar</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="./src/main.js"></script>
+     
+  </body>
+</html>

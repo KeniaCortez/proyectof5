@@ -1,0 +1,28 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: #f8f9fa;
+}
+
+.sidebar {
+  width: 200px;
+  min-height: calc(100vh - 56px); /* altura total menos navbar */
+}
+
+/* Bombilla */
+.bulb {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #333;
+}
+
+.bulb-off {
+  background-color: #ccc;
+}
+
+.bulb-on {
+  background-color: yellow;
+  box-shadow: 0 0 15px yellow;
+}
