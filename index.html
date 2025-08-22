@@ -3,78 +3,97 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Control de Dispositivos</title>
-    <link rel="stylesheet" href="./src/style.css" />
+    <title>Panel de Control</title>
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   </head>
-  <body>
-    <div class="main-container">
-      <header>
-        <nav>
-          <a href="#" class="nav-link" data-view="welcome">Inicio</a>
-          <a href="#" class="nav-link" data-view="register">Registro</a>
-          <a href="#" class="nav-link" data-view="login">Ingresar</a>
-          <a href="#" class="nav-link" id="logoutBtn" style="display: none"
-            >Cerrar Sesión</a
-          >
-        </nav>
-      </header>
+  <body class="pink-theme">
+    <nav class="navbar-interactive">
+      <a class="logo-text" href="#">Panel IoT</a>
+      <div class="user-info-container">
+        <span id="userEmail" class="user-email-text d-none"></span>
+        <button id="loginBtn" class="nav-button">Login</button>
+        <button id="logoutBtn" class="nav-button logout-btn d-none">
+          Logout
+        </button>
+      </div>
+    </nav>
 
-      <main id="content-container">
-        <section id="welcomeView" class="view">
-          <div class="welcome-card">
-            <h1>Bienvenido!!</h1>
-            <p>Por favor, registra un nuevo usuario.</p>
+    <main class="main-content-area">
+      <div class="view-navigation-header">
+        <button class="nav-button nav-link-btn" data-view="dashboard">
+          Dashboard
+        </button>
+        <button class="nav-button nav-link-btn" data-view="light">
+          Control de Foco
+        </button>
+      </div>
+
+      <section id="loginView" class="view-card animated-card">
+        <h3 class="card-title">Inicia Sesión</h3>
+        <form id="loginForm" class="login-form">
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input
+              id="email"
+              type="email"
+              class="form-input"
+              placeholder="ejemplo@hotmail.com"
+              required
+            />
           </div>
-        </section>
-
-        <section id="registerView" class="view" style="display: none">
-          <div class="form-card">
-            <h2>Registrar Usuario</h2>
-            <form id="registerForm">
-              <label for="deviceName">Correo:</label>
-              <input type="text" id="deviceName" required />
-
-              <label for="enrollId">Contraseña:</label>
-              <input type="password" id="enrollId" required />
-
-              <button type="submit" id="registerBtn">Registrar</button>
-            </form>
-            <div id="registerMessage" class="message"></div>
+          <div class="form-group">
+            <label for="password" class="form-label">Contraseña</label>
+            <input
+              id="password"
+              type="password"
+              class="form-input"
+              placeholder="••••••"
+              required
+            />
           </div>
-        </section>
+          <button class="action-button primary-button" type="submit">
+            Entrar
+          </button>
+          <div id="loginError" class="error-text d-none"></div>
+        </form>
+      </section>
 
-        <section id="loginView" class="view" style="display: none">
-          <div class="form-card">
-            <h2>Ingresar</h2>
-            <form id="loginForm">
-              <label for="loginEnrollId">Registro:</label>
-              <input type="password" id="loginEnrollId" required />
-              <button type="submit" id="loginBtn">Ingresar</button>
-            </form>
-            <div id="loginMessage" class="message"></div>
-          </div>
-        </section>
+      <section id="dashboardView" class="view-card d-none animated-card">
+        <h3 class="card-title">Bienvenido 👋</h3>
+        <p class="card-subtitle">
+          Selecciona una opción del menú de navegación.
+        </p>
+      </section>
 
-        <section id="controlView" class="view" style="display: none">
-          <div class="device-card">
-            <h2 id="deviceControlTitle">
-              Control de Dispositivo: <span id="deviceNameDisplay"></span>
-            </h2>
-            <p>Registro: <span id="enrollIdDisplay"></span></p>
-            <p>Último Valor: <span id="lastValueDisplay"></span></p>
-            <p>Estado: <span id="statusDisplay">APAGADO</span></p>
-
-            <div class="button-group">
-              <button id="turnOnBtn">Encender</button>
-              <button id="turnOffBtn">Apagar</button>
-              <button id="refreshBtn">Actualizar</button>
+      <section id="lightView" class="view-card d-none animated-card">
+        <h3 class="card-title">Control de Foco</h3>
+        <div class="light-control-container">
+          <div class="light-status-area">
+            <div id="lightBulb" class="bulb bulb-off"></div>
+            <div class="status-info">
+              <span class="status-label">Estado:</span>
+              <span id="lightStateText" class="status-value">Apagado</span>
             </div>
+            <span id="lightStatusBadge" class="status-badge">Desconocido</span>
           </div>
-        </section>
-      </main>
-    </div>
+          <div class="control-buttons">
+            <button id="btnOn" class="action-button on-button">Encender</button>
+            <button id="btnOff" class="action-button off-button">Apagar</button>
+          </div>
+        </div>
+        <div id="lightError" class="error-text d-none"></div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="./src/main.js"></script>
+    <script>
+      const bootstrapCss = document.createElement("link");
+      bootstrapCss.rel = "stylesheet";
+      bootstrapCss.href =
+        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css";
+      document.head.appendChild(bootstrapCss);
+    </script>
      
   </body>
 </html>

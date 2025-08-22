@@ -1,276 +1,324 @@
-html,
-body {
-  height: 100%;
-  margin: 0;
-  background: #f8f9fa;
+/* Paleta de colores */
+:root {
+  --color-hot-pink: #ff1493; /* Rosa fuerte, más vibrante */
+  --color-primary-pink: #ff69b4; /* Rosa medio */
+  --color-light-pink: #fde2f8; /* Rosa muy claro */
+  --color-white: #ffffff;
+  --color-gray: #555;
+  --color-bulb-on: #ffd700;
+  --color-bulb-off: #ccc;
 }
 
-.sidebar {
-  width: 200px;
-  min-height: calc(100vh - 56px); /* altura total menos navbar */
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 5px var(--color-bulb-on), 0 0 10px var(--color-bulb-on);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--color-bulb-on), 0 0 40px var(--color-bulb-on);
+  }
+  100% {
+    box-shadow: 0 0 5px var(--color-bulb-on), 0 0 10px var(--color-bulb-on);
+  }
+}
+
+@keyframes buttonPress {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Base y tipografía */
+body {
+  background-color: var(--color-light-pink);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--color-gray);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content-area {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Navbar Interactiva */
+.navbar-interactive {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background-color: var(--color-primary-pink);
+  color: var(--color-white);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-white);
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.logo-text:hover {
+  transform: scale(1.05);
+}
+
+.user-info-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-email-text {
+  font-size: 0.9rem;
+  color: var(--color-white);
+}
+
+.nav-button {
+  background-color: var(--color-white);
+  color: var(--color-primary-pink);
+  border: none;
+  padding: 8px 20px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logout-btn {
+  background-color: transparent;
+  color: var(--color-white);
+  border: 2px solid var(--color-white);
+}
+
+.logout-btn:hover {
+  background-color: var(--color-white);
+  color: var(--color-primary-pink);
+}
+
+/* Nueva sección de navegación */
+.view-navigation-header {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  width: 100%;
+}
+
+.nav-link-btn {
+  background-color: var(--color-primary-pink) !important;
+  color: var(--color-white) !important;
+  border: 2px solid var(--color-primary-pink) !important;
+  border-radius: 15px;
+  padding: 10px 20px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.nav-link-btn:hover {
+  background-color: var(--color-white) !important;
+  color: var(--color-primary-pink) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Tarjetas y formularios */
+.view-card {
+  width: 100%;
+  max-width: 500px;
+  background-color: var(--color-white);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 40px;
+  animation: fadeIn 0.8s ease-in-out forwards;
+}
+
+.animated-card {
+  transition: transform 0.4s ease-out;
+}
+
+.animated-card:hover {
+  transform: translateY(-8px);
+}
+
+.card-title {
+  color: var(--color-hot-pink);
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.card-subtitle {
+  text-align: center;
+  color: var(--color-gray);
+  margin-bottom: 20px;
+}
+
+.login-form,
+.light-control-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-primary-pink);
+  box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.2);
+}
+
+.error-text {
+  color: var(--color-hot-pink);
+  text-align: center;
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+/* Botones de acción */
+.action-button {
+  border: none;
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.primary-button {
+  background-color: var(--color-hot-pink);
+  color: var(--color-white);
+}
+
+.primary-button:hover {
+  background-color: var(--color-primary-pink);
+  transform: scale(1.02);
+}
+
+/* Control del Foco */
+.light-status-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.status-info {
+  text-align: center;
+}
+
+.status-label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.status-value {
+  font-size: 1.2rem;
+  color: var(--color-hot-pink);
+}
+
+.status-badge {
+  padding: 5px 15px;
+  border-radius: 20px;
+  background-color: #eee;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.control-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.on-button {
+  background-color: #ffd700;
+  color: #8b4513; /* Un café oscuro para contraste */
+}
+
+.on-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+}
+
+.off-button {
+  background-color: #888;
+  color: var(--color-white);
+}
+
+.off-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Bombilla */
 .bulb {
-  width: 40px;
-  height: 40px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  border: 2px solid #333;
-}
-
-.bulb-off {
-  background-color: #ccc;
+  transition: background-color 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+  border: 3px solid var(--color-gray);
 }
 
 .bulb-on {
-  background-color: yellow;
-  box-shadow: 0 0 15px yellow;
-}
-/*
- * Google Fonts:
- * - Roboto (para el cuerpo del texto)
- * - Montserrat (para títulos y acentos)
- */
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Roboto:wght@400;500&display=swap");
-
-/* =============================
-    CONFIGURACIÓN BÁSICA
-============================= */
-:root {
-  /* Nuevo esquema de colores */
-  --background-color: #ffb6c1; /* Rosa pastel para el fondo */
-  --card-background: #ffffff; /* Blanco para los apartados */
-  --main-pink: #e91e63; /* Rosa chicle / fucsia para acentos */
-  --light-pink: #f8bbd0; /* Rosa claro para sombras y detalles */
-  --gray-text: #444444; /* Gris oscuro para texto general */
-  --border-color: #f8bbd0; /* Rosa claro para bordes */
-  --button-hover: #ffc0cb; /* Rosa claro para el hover de botones */
-  --button-active: #ff69b4; /* Rosa medio para el estado activo */
-  --success-color: #e91e63; /* Rosa principal para estado 'ON' */
-  --error-color: #d32f2f; /* Rojo para errores */
+  background-color: var(--color-bulb-on);
+  animation: pulseGlow 2s infinite ease-in-out;
 }
 
-body {
-  background-color: var(--background-color);
-  color: var(--gray-text);
-  font-family: "Roboto", sans-serif; /* Nueva tipografía para el cuerpo */
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-/* =============================
-    LAYOUT GENERAL
-============================= */
-.main-container {
-  width: 100%;
-  max-width: 900px;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-header {
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-nav a.nav-link {
-  color: var(--gray-text);
-  text-decoration: none;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  transition: color 0.3s, background-color 0.3s;
-}
-
-nav a.nav-link:hover {
-  color: var(--main-pink);
-  background-color: var(--button-hover);
-}
-
-nav a.nav-link.active {
-  color: var(--main-pink);
-  border-bottom: 2px solid var(--main-pink);
-}
-
-/* =============================
-    ESTILO DE CONTENEDORES
-============================= */
-.view {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.welcome-card,
-.form-card,
-.device-card {
-  background-color: var(--card-background);
-  border: 1px solid var(--border-color);
-  padding: 3rem 2rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease-in-out;
-  position: relative;
-  overflow: hidden;
-  max-width: 500px;
-  width: 100%;
-}
-
-.welcome-card::before,
-.form-card::before,
-.device-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  box-shadow: 0 0 15px var(--light-pink), inset 0 0 15px var(--light-pink);
-  opacity: 0.5; /* Aumenta la opacidad para un efecto más notorio */
-  pointer-events: none;
-  z-index: 0;
-}
-
-h1,
-h2 {
-  font-family: "Montserrat", sans-serif; /* Nueva tipografía para títulos */
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--main-pink);
-  text-shadow: 0 0 5px var(--light-pink); /* Sombra para efecto neón */
-  margin-bottom: 2rem;
-}
-
-p {
-  color: var(--gray-text);
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
-/* =============================
-    FORMULARIOS Y BOTONES
-============================= */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  z-index: 1;
-  position: relative;
-}
-
-label {
-  text-align: left;
-  color: var(--main-pink);
-  font-weight: 500;
-}
-
-input[type="text"],
-input[type="password"] {
-  background-color: var(--background-color);
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  color: var(--gray-text);
-  padding: 0.75rem 1rem;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-input[type="text"]:focus,
-input[type="password"]:focus {
-  outline: none;
-  border-color: var(--main-pink);
-  box-shadow: 0 0 5px var(--main-pink);
-}
-
-button {
-  background-color: var(--card-background);
-  color: var(--main-pink);
-  border: 1px solid var(--main-pink);
-  border-radius: 5px;
-  padding: 0.75rem 1.5rem;
-  cursor: pointer;
-  font-weight: bold;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  transition: background-color 0.3s, box-shadow 0.3s, transform 0.2s;
-}
-
-button:hover {
-  background-color: var(--main-pink);
-  color: var(--card-background);
-  box-shadow: 0 0 10px var(--main-pink);
-  transform: translateY(-2px);
-}
-
-button:active {
-  background-color: var(--button-active);
-  transform: translateY(0);
-}
-
-.message {
-  margin-top: 1rem;
-  font-weight: bold;
-}
-
-/* =============================
-    VISTA DE CONTROL DE DISPOSITIVO
-============================= */
-.device-card h2 {
-  margin-bottom: 1rem;
-}
-
-.device-card p {
-  margin: 0.5rem 0;
-  font-size: 0.9rem;
-}
-
-#deviceControlTitle {
-  font-size: 1.5rem;
-  color: var(--main-pink);
-}
-
-#statusDisplay {
-  font-weight: bold;
-  color: var(--main-pink);
-  text-shadow: 0 0 5px var(--light-pink);
-}
-
-.button-group {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.button-group button {
-  flex-grow: 1;
-}
-
-/* Nuevo estilo para los botones activos */
-#turnOnBtn.active,
-#turnOffBtn.active {
-  background-color: var(--main-pink);
-  color: var(--card-background);
-  border-color: var(--main-pink);
-  box-shadow: 0 0 10px var(--main-pink);
-}
-
-/* =============================
-    UTILIDADES
-============================= */
-.d-none {
-  display: none !important;
-}
-
-/* Media Queries para responsividad */
-@media (max-width: 768px) {
-  .welcome-card,
-  .form-card,
-  .device-card {
-    padding: 2rem 1rem;
-  }
+.bulb-off {
+  background-color: var(--color-bulb-off);
 }

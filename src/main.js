@@ -1,274 +1,358 @@
-// Bootstrap desde npm (sin CDN)
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./style.css";
 
 /* =============================
-    CONFIG
+    CONFIG
 ============================= */
-const API_BASE = "https://ejemplo40.onrender.com/status";
-const ENDPOINTS = {
-  register: `${API_BASE}/register-device`,
-  login: `${API_BASE}/login-device`,
-  status: `${API_BASE}/device-status`,
-  on: `${API_BASE}/turn-on-device`,
-  off: `${API_BASE}/turn-off-device`,
-};
-const TOKEN_KEY = "device_token";
 
-/* =============================
-    AUTH HELPERS
-============================= */
-const isAuthenticated = () => Boolean(localStorage.getItem(TOKEN_KEY));
-const login = (token, deviceName, enrollId) => {
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem("device_name", deviceName);
-  localStorage.setItem("enroll_id", enrollId);
+const API_BASE = "https://ejemplo40.onrender.com"; // Tu API
+const ENDPOINTS = {
+  status: `${API_BASE}/status`,
+  turnOn: `${API_BASE}/status/turn-on`,
+  turnOff: `${API_BASE}/status/turn-off`, // Nuevo endpoint para registrar usuarios o dispositivos
+  registerDevice: `${API_BASE}/register-device`, // Asume que este es el endpoint
 };
+
+// Login simulado:
+const TOKEN_KEY = "token_demo";
+/* =============================
+    AUTH HELPERS
+============================= */
+
+const isAuthenticated = () => Boolean(localStorage.getItem(TOKEN_KEY));
+
+const login = () => localStorage.setItem(TOKEN_KEY, "FAKE_TOKEN");
+
 const logout = () => {
   localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem("device_name");
-  localStorage.removeItem("enroll_id");
+
+  localStorage.removeItem("last_email"); // También eliminamos el email guardado
 };
+
 const getToken = () => localStorage.getItem(TOKEN_KEY);
 
 /* =============================
-    DOM REFS
+
+    DOM REFS
+
 ============================= */
-const views = {
-  welcome: document.getElementById("welcomeView"),
-  register: document.getElementById("registerView"),
-  login: document.getElementById("loginView"),
-  control: document.getElementById("controlView"),
-};
 
-const registerForm = document.getElementById("registerForm");
-const deviceNameInput = document.getElementById("deviceName");
-const enrollIdInput = document.getElementById("enrollId");
-const registerMessage = document.getElementById("registerMessage");
-const registerBtn = document.getElementById("registerBtn");
+const loginView = document.querySelector("#loginView");
 
-const loginForm = document.getElementById("loginForm");
-const loginEnrollIdInput = document.getElementById("loginEnrollId");
-const loginMessage = document.getElementById("loginMessage");
+const dashboardView = document.querySelector("#dashboardView");
 
-const logoutBtn = document.getElementById("logoutBtn");
-const navLinks = Array.from(document.querySelectorAll("nav a"));
+const lightView = document.querySelector("#lightView");
 
-const deviceNameDisplay = document.getElementById("deviceNameDisplay");
-const enrollIdDisplay = document.getElementById("enrollIdDisplay");
-const lastValueDisplay = document.getElementById("lastValueDisplay");
-const statusDisplay = document.getElementById("statusDisplay");
-const turnOnBtn = document.getElementById("turnOnBtn");
-const turnOffBtn = document.getElementById("turnOffBtn");
-const refreshBtn = document.getElementById("refreshBtn");
+const loginForm = document.querySelector("#loginForm");
+
+const emailInput = document.querySelector("#email");
+
+const passInput = document.querySelector("#password");
+
+const loginError = document.querySelector("#loginError");
+
+const loginBtn = document.querySelector("#loginBtn");
+
+const logoutBtn = document.querySelector("#logoutBtn");
+
+const userEmailSpan = document.querySelector("#userEmail");
+
+const links = Array.from(document.querySelectorAll("[data-view]"));
+
+const lightBulb = document.querySelector("#lightBulb");
+
+const lightText = document.querySelector("#lightStateText");
+
+const lightError = document.querySelector("#lightError");
+
+const lightStatusBadge = document.querySelector("#lightStatusBadge");
+
+const btnOn = document.querySelector("#btnOn");
+
+const btnOff = document.querySelector("#btnOff");
 
 /* =============================
-    UI STATE & NAVIGATION
+
+    UI STATE
+
 ============================= */
-function showView(viewName) {
-  Object.values(views).forEach((view) => {
-    view.style.display = "none";
-  });
-  if (views[viewName]) {
-    views[viewName].style.display = "flex";
+
+function showView(view) {
+  // Oculta todas
+
+  loginView.classList.add("d-none");
+
+  dashboardView.classList.add("d-none");
+
+  lightView.classList.add("d-none"); // Rutas protegidas
+
+  if (!isAuthenticated() && (view === "dashboard" || view === "light")) {
+    loginView.classList.remove("d-none");
+
+    return;
   }
-  updateNav(viewName);
+
+  if (view === "login") loginView.classList.remove("d-none");
+
+  if (view === "dashboard") dashboardView.classList.remove("d-none");
+
+  if (view === "light") {
+    lightView.classList.remove("d-none"); // cada vez que entras al control, refresca estado
+
+    getStatus();
+  }
 }
 
 function updateNav() {
-  const auth = isAuthenticated();
-  if (auth) {
-    logoutBtn.style.display = "inline-block";
-    // Muestra solo los enlaces permitidos para usuarios autenticados
-    navLinks.forEach((link) => {
-      const view = link.getAttribute("data-view");
-      if (view === "welcome" || view === "register" || view === "login") {
-        link.style.display = "none";
-      } else {
-        link.style.display = "inline-block";
-      }
-    });
+  if (isAuthenticated()) {
+    userEmailSpan.textContent = localStorage.getItem("last_email") || "Usuario";
+
+    userEmailSpan.classList.remove("d-none");
+
+    loginBtn.classList.add("d-none");
+
+    logoutBtn.classList.remove("d-none");
   } else {
-    logoutBtn.style.display = "none";
-    // Muestra solo los enlaces permitidos para usuarios no autenticados
-    navLinks.forEach((link) => {
-      const view = link.getAttribute("data-view");
-      if (view === "control") {
-        link.style.display = "none";
-      } else {
-        link.style.display = "inline-block";
-      }
-    });
+    userEmailSpan.textContent = "";
+
+    userEmailSpan.classList.add("d-none");
+
+    loginBtn.classList.remove("d-none");
+
+    logoutBtn.classList.add("d-none");
   }
 }
 
-function updateControlPanel() {
-  deviceNameDisplay.textContent = localStorage.getItem("device_name");
-  enrollIdDisplay.textContent = localStorage.getItem("enroll_id");
-}
-
 /* =============================
-    EVENT LISTENERS
-============================= */
-navLinks.forEach((link) => {
-  link.addEventListener("click", (e) => {
-    e.preventDefault();
-    const view = link.getAttribute("data-view");
 
-    if (view === "logout") {
-      handleLogout();
-    } else {
-      // Redirige según si el usuario está autenticado
-      if (isAuthenticated()) {
-        showView("control");
-      } else {
-        showView(view);
-      }
-    }
-    // Actualiza el estado activo del enlace
-    navLinks.forEach((navLink) => navLink.classList.remove("active"));
-    link.classList.add("active");
+    EVENTOS GENERALES
+
+============================= */
+
+links.forEach((a) => {
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const view = a.getAttribute("data-view"); // activa visualmente el link
+
+    links.forEach((l) => l.classList.remove("active"));
+
+    a.classList.add("active");
+
+    showView(view);
   });
 });
 
+loginBtn.addEventListener("click", () => showView("login"));
+
 logoutBtn.addEventListener("click", () => {
-  handleLogout();
+  logout();
+
+  updateNav(); // vuelve a login
+
+  links.forEach((l) => l.classList.remove("active"));
+
+  showView("login");
 });
 
-registerForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const deviceName = deviceNameInput.value.trim();
-  const enrollId = enrollIdInput.value.trim();
+/* =============================
 
-  registerMessage.textContent = "";
-  registerMessage.style.color = "red";
-  registerBtn.disabled = true;
+    LOGIN (PERSONALIZADO)
 
+============================= */
+
+// Nueva función para registrar el dispositivo con más datos
+
+async function registerDevice(email, password, lightStatus) {
   try {
-    const res = await fetch(ENDPOINTS.register, {
+    const res = await fetch(ENDPOINTS.registerDevice, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ deviceName, enrollId }),
+
+      headers: authHeaders(),
+
+      body: JSON.stringify({
+        // Se asume que tu backend espera "device_name", "enroll_id" y "status"
+
+        device_name: email,
+
+        enroll_id: password,
+
+        status: lightStatus,
+      }),
     });
+
+    if (!res.ok) {
+      throw new Error("No se pudo registrar el dispositivo en el backend");
+    }
 
     const data = await res.json();
 
-    if (res.ok) {
-      registerMessage.textContent =
-        data.message || "Dispositivo registrado exitosamente.";
-      registerMessage.style.color = "lightgreen";
-      registerForm.reset();
-    } else {
-      registerMessage.textContent =
-        data.message || "Error al registrar el dispositivo. Intenta de nuevo.";
-    }
+    console.log("Dispositivo registrado con éxito:", data);
   } catch (err) {
-    console.error("Error en la solicitud de registro:", err);
-    registerMessage.textContent =
-      "Error de red: No se pudo conectar al servidor. Asegúrate de que está en línea.";
-  } finally {
-    registerBtn.disabled = false;
+    console.error("Error al registrar dispositivo:", err); // Podrías mostrar un mensaje de error al usuario si lo deseas
   }
-});
+}
 
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const enrollId = loginEnrollIdInput.value.trim();
-  loginMessage.textContent = "";
+  loginError.classList.add("d-none");
 
-  try {
-    const res = await fetch(ENDPOINTS.login, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ enrollId }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      login(data.token, data.deviceName, data.enrollId);
-      showView("control");
-      updateControlPanel();
-      getDeviceStatus();
-    } else {
-      loginMessage.textContent = data.message || "Enroll ID no encontrado.";
-      loginMessage.style.color = "red";
+  const email = emailInput.value.trim();
+  const pass = passInput.value;
+
+  if (email && pass) {
+    login(); // Simula el login
+    localStorage.setItem("last_email", email);
+    updateNav();
+
+    // 1. Obtener el estado actual del foco desde la API
+    let currentLightStatus = "off"; // Valor predeterminado
+    try {
+      const statusRes = await fetch(ENDPOINTS.status);
+      const statusData = await statusRes.json();
+      // ¡Aquí está el cambio! Solo toma el valor booleano
+      const isOn = statusData.status.isOn;
+      // Y lo convierte a un string "on" o "off"
+      currentLightStatus = isOn ? "on" : "off";
+    } catch (err) {
+      console.error(
+        "No se pudo obtener el estado del foco para registrarlo:",
+        err
+      );
     }
-  } catch (err) {
-    loginMessage.textContent = "Error en la conexión. Intente de nuevo.";
-    loginMessage.style.color = "red";
+
+    // 2. Llama a la nueva función para registrar el dispositivo con el email, contraseña y el string "on"/"off"
+    await registerDevice(email, pass, currentLightStatus);
+
+    // Navega al dashboard
+    links.forEach((l) => l.classList.remove("active"));
+    document.querySelector('[data-view="dashboard"]').classList.add("active");
+    showView("dashboard");
+  } else {
+    loginError.textContent = "Por favor, ingresa un email y una contraseña.";
+    loginError.classList.remove("d-none");
   }
 });
 
-turnOnBtn.addEventListener("click", () => controlDevice("on"));
-turnOffBtn.addEventListener("click", () => controlDevice("off"));
-refreshBtn.addEventListener("click", () => getDeviceStatus());
+/* =============================
+
+    CONTROL FOCO (API)
+
+============================= */
+
+function renderLight(state) {
+  const isOn = state === "on" || state === true;
+
+  if (isOn) {
+    lightBulb.classList.add("bulb-on");
+
+    lightBulb.classList.remove("bulb-off");
+
+    lightText.textContent = "Encendido";
+
+    lightStatusBadge.className = "badge text-bg-success";
+
+    lightStatusBadge.textContent = "Encendido";
+  } else {
+    lightBulb.classList.add("bulb-off");
+
+    lightBulb.classList.remove("bulb-on");
+
+    lightText.textContent = "Apagado";
+
+    lightStatusBadge.className = "badge text-bg-secondary";
+
+    lightStatusBadge.textContent = "Apagado";
+  }
+}
+
+async function getStatus() {
+  try {
+    lightError.classList.add("d-none");
+
+    const res = await fetch(ENDPOINTS.status, {
+      headers: authHeaders(),
+    }); // Suponiendo { status: "on" } / { status: "off" }
+
+    const data = await res.json();
+
+    renderLight(data.status);
+  } catch (err) {
+    console.error("Error al obtener estado:", err);
+
+    lightError.textContent = "No se pudo obtener el estado del foco";
+
+    lightError.classList.remove("d-none");
+  }
+}
+
+async function turnOn() {
+  try {
+    lightError.classList.add("d-none");
+
+    await fetch(ENDPOINTS.turnOn, {
+      method: "POST",
+
+      headers: authHeaders(),
+    });
+
+    renderLight("on");
+  } catch (err) {
+    console.error("Error al encender:", err);
+
+    lightError.textContent = "No se pudo encender el foco";
+
+    lightError.classList.remove("d-none");
+  }
+}
+
+async function turnOff() {
+  try {
+    lightError.classList.add("d-none");
+
+    await fetch(ENDPOINTS.turnOff, {
+      method: "POST",
+
+      headers: authHeaders(),
+    });
+
+    renderLight("off");
+  } catch (err) {
+    console.error("Error al apagar:", err);
+
+    lightError.textContent = "No se pudo apagar el foco";
+
+    lightError.classList.remove("d-none");
+  }
+}
+
+// Si tu backend pide Authorization, la enviamos.
+
+// En este demo, solo se agrega si hay token.
+
+function authHeaders() {
+  const headers = { "Content-Type": "application/json" };
+
+  const token = getToken();
+
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  return headers;
+}
+
+btnOn.addEventListener("click", turnOn);
+
+btnOff.addEventListener("click", turnOff);
 
 /* =============================
-    API CALLS & LOGIC
+
+    INICIALIZACIÓN
+
 ============================= */
-async function getDeviceStatus() {
-  if (!isAuthenticated()) return;
-  try {
-    const res = await fetch(ENDPOINTS.status, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
-    const data = await res.json();
-    if (res.ok) {
-      statusDisplay.textContent = data.status;
-      lastValueDisplay.textContent = data.lastValue;
 
-      // Actualiza la clase activa de los botones
-      turnOnBtn.classList.remove("active");
-      turnOffBtn.classList.remove("active");
-      if (data.status === "on") {
-        turnOnBtn.classList.add("active");
-      } else if (data.status === "off") {
-        turnOffBtn.classList.add("active");
-      }
-    } else {
-      console.error(data.message);
-    }
-  } catch (err) {
-    console.error("Failed to fetch device status:", err);
-  }
-}
-
-async function controlDevice(action) {
-  if (!isAuthenticated()) return;
-  const url = action === "on" ? ENDPOINTS.on : ENDPOINTS.off;
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getToken()}`,
-      },
-      body: JSON.stringify({ deviceId: localStorage.getItem("enroll_id") }),
-    });
-    const data = await await res.json();
-    if (res.ok) {
-      // Llama a getDeviceStatus para reflejar el nuevo estado
-      getDeviceStatus();
-    } else {
-      console.error(data.message);
-    }
-  } catch (err) {
-    console.error(`Failed to ${action} device:`, err);
-  }
-}
-
-function handleLogout() {
-  logout();
-  showView("welcome");
-}
-
-// Estado inicial
-// Determina la vista inicial según si el usuario está autenticado
-if (isAuthenticated()) {
-  showView("control");
-  updateControlPanel();
-  getDeviceStatus();
-} else {
-  showView("welcome");
-}
 updateNav();
+
+// al cargar, muestra login o dashboard según token
+
+showView(isAuthenticated() ? "dashboard" : "login");
